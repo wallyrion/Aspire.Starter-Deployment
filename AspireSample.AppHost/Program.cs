@@ -1,5 +1,11 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
+var postgres = builder.AddPostgres("postgres")
+    .PublishAsAzurePostgresFlexibleServer();
+
+var postgresdb = postgres.AddDatabase("postgresdb");
+
+
 var cache = builder.AddRedis("cache");
 /*builder.AddRedis("redis").PublishAsAzureRedis((_, _, cache) =>
 {
@@ -20,6 +26,7 @@ var apiService = builder.AddProject<Projects.AspireSample_ApiService>("apiservic
 builder.AddProject<Projects.AspireSample_Web>("webfrontend")
     .WithExternalHttpEndpoints()
     .WithReference(cache)
-    .WithReference(apiService);
+    .WithReference(apiService)
+    .WithReference(postgresdb);
 
 builder.Build().Run();
