@@ -23,6 +23,8 @@ properties:
     secrets:
       - name: connectionstrings--cache
         value: cache:6379
+      - name: connectionstrings--postgresdb
+        value: '{{ secretOutput "SERVICE_BINDING_KVD0D4074E_ENDPOINT" "connectionString" }};Database=postgresdb'
   template:
     containers:
       - image: {{ .Image }}
@@ -46,6 +48,8 @@ properties:
             value: https://apiservice.internal.{{ .Env.AZURE_CONTAINER_APPS_ENVIRONMENT_DEFAULT_DOMAIN }}
           - name: ConnectionStrings__cache
             secretRef: connectionstrings--cache
+          - name: ConnectionStrings__postgresdb
+            secretRef: connectionstrings--postgresdb
     scale:
       minReplicas: 1
 tags:

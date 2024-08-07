@@ -12,6 +12,19 @@ param location string
 @description('Id of the user or app to assign application roles')
 param principalId string = ''
 
+@metadata({azd: {
+  type: 'generate'
+  config: {length:22}
+  }
+})
+@secure()
+param postgres_password string
+@metadata({azd: {
+  type: 'generate'
+  config: {length:10,noNumeric:true,noSpecial:true}
+  }
+})
+param postgres_username string
 
 var tags = {
   'azd-env-name': environmentName
@@ -33,6 +46,16 @@ module resources 'resources.bicep' = {
   }
 }
 
+module postgres 'postgres/postgres.module.bicep' = {
+  name: 'postgres'
+  scope: rg
+  params: {
+    administratorLogin: postgres_username
+    administratorLoginPassword: postgres_password
+    keyVaultName: resources.outputs.SERVICE_BINDING_KVD0D4074E_NAME
+    location: location
+  }
+}
 output MANAGED_IDENTITY_CLIENT_ID string = resources.outputs.MANAGED_IDENTITY_CLIENT_ID
 output MANAGED_IDENTITY_NAME string = resources.outputs.MANAGED_IDENTITY_NAME
 output AZURE_LOG_ANALYTICS_WORKSPACE_NAME string = resources.outputs.AZURE_LOG_ANALYTICS_WORKSPACE_NAME
@@ -41,3 +64,4 @@ output AZURE_CONTAINER_REGISTRY_MANAGED_IDENTITY_ID string = resources.outputs.A
 output AZURE_CONTAINER_APPS_ENVIRONMENT_NAME string = resources.outputs.AZURE_CONTAINER_APPS_ENVIRONMENT_NAME
 output AZURE_CONTAINER_APPS_ENVIRONMENT_ID string = resources.outputs.AZURE_CONTAINER_APPS_ENVIRONMENT_ID
 output AZURE_CONTAINER_APPS_ENVIRONMENT_DEFAULT_DOMAIN string = resources.outputs.AZURE_CONTAINER_APPS_ENVIRONMENT_DEFAULT_DOMAIN
+output SERVICE_BINDING_KVD0D4074E_ENDPOINT string = resources.outputs.SERVICE_BINDING_KVD0D4074E_ENDPOINT
